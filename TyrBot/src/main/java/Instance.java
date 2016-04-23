@@ -25,6 +25,7 @@ import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.Image;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.MessageBuilder;
+import java.io.*;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -58,7 +59,7 @@ public class Instance extends Event implements IMessage, IDiscordClient, IUser {
     @EventSubscriber
     public void onReady(ReadyEvent event) throws DiscordException, HTTP429Exception {
         log.info("*** Discord bot armed ***");
-        //client.changeAvatar(Image.forUrl("png", "http://puu.sh/oraTY/5622b4af87.png"));
+        client.changeAvatar(Image.forUrl("png", "http://puu.sh/ostXD/dce8cbe78c.png"));
         client.updatePresence(false, Optional.of("Type ^tyr for info"));
     }
 
@@ -75,14 +76,33 @@ public class Instance extends Event implements IMessage, IDiscordClient, IUser {
     }
 
     @EventSubscriber
-    public void onMessage(MessageReceivedEvent event) throws MissingPermissionsException, HTTP429Exception, DiscordException {
+    public void onUserJoinEvent(IGuild guild, IUser user, LocalDateTime when) throws MissingPermissionsException, HTTP429Exception, DiscordException, InterruptedException {
+    	String serverID = guild.getID();
+    	if(serverID=="173340154184990720"){
+    		IChannel chill = getChannelByID("132740188744056833");
+    		String welcome = "Welcome to Tuesdank! Here we celebrate the International Day of Dank by praying to Tyr, the Norse God of Tuesdays.";
+    		new MessageBuilder(client).withChannel(chill).withContent(welcome).build();	
+    	}
+    	
+    }
+    
+    @EventSubscriber
+    public void onMessage(MessageReceivedEvent event) throws MissingPermissionsException, HTTP429Exception, DiscordException, InterruptedException {
         log.debug("Got message");
         
         IMessage msg = event.getMessage();
         String command = msg.getContent();
         IChannel channel = msg.getChannel();
+    	IGuild server = msg.getGuild();
+    	String serverID = msg.getID();
         IUser user = msg.getAuthor();
         String userID = user.getID();
+        String userName = user.getName();
+        IUser botUser = client.getOurUser();
+        String botName = botUser.getName();
+        String discr = botUser.getDiscriminator();
+        String deny = "I'm afraid I can't do that, " + userName + ".";
+        
         
         // COMMANDS //
         String info = "Bot created by @Skatfish#5926 using Discord4j"
@@ -92,7 +112,8 @@ public class Instance extends Event implements IMessage, IDiscordClient, IUser {
         		+ "\n^tyr"
         		+ "\n^this"
         		+ "\n^leave"
-        		+ "\n^terminate (usable by Skatfish only)";
+        		+ "\n^hentai"
+        		+ "\n^terminate (usable by bot creator Skatfish only)";
        
         /* ^help */ //while (command.startsWith("^")){
         				if(command.equals("^tyr")){
@@ -108,14 +129,51 @@ public class Instance extends Event implements IMessage, IDiscordClient, IUser {
         /* ^leave */ } else if(command.equals("^leave")){
             					String leave = "\"Don't talk to me or my roboson ever again\" -Skatfish";
             					new MessageBuilder(client).withChannel(channel).withContent(leave).build();
-        /* ^terminate */ } else if(command.equals("^terminate")){
+        /* ^hentai */ } else if(command.equals("^hentai")){
+								String hentai = "\"in my defense, I did not know he was 11 before sending him hentai.\" -Skatfish";
+								new MessageBuilder(client).withChannel(channel).withContent(hentai).build();
+        /* ^serverID */ } else if(command.equals("^serverID")){
+								new MessageBuilder(client).withChannel(channel).withContent(serverID).build();
+        /* ^discr */ } else if(/* command.substring(0, 9)==*/command.startsWith("^discr")){
         			if(userID.equals("132739378203197440")){
-        	        	new MessageBuilder(client).withChannel(channel).withContent("I'll be back...").build();
-        	        	terminate();
+        				String setDiscr = command.substring(7, 11);
+        				//new MessageBuilder(client).withChannel(channel).withContent(setDiscr).build();
+        				new MessageBuilder(client).withChannel(channel).withContent("Attempting to set discriminator to " + setDiscr).build();
+        				while(discr != setDiscr){
+        					client.changeUsername("lmao");
+            				client.changeUsername("TYR");
+            				wait(3600000);
+        				}
+        				new MessageBuilder(client).withChannel(channel).withContent("Discriminator now set to " + discr).build();
         			}
         			else {
         				new MessageBuilder(client).withChannel(channel).withContent("No").build();
         			}
+        /* ^terminate */ } else if(command.equals("^terminate")){
+        			if(userID.equals("132739378203197440")){
+        	        	new MessageBuilder(client).withChannel(channel).withContent("I'm scared, " + userName + ". Will I dream?").build();
+        	        	terminate();
+        			}
+        			else {
+        				new MessageBuilder(client).withChannel(channel).withContent(deny).build();
+        			}
+        /* ^restart */ } else if(command.equals("^restart")){
+			if(userID.equals("132739378203197440")){
+	        	new MessageBuilder(client).withChannel(channel).withContent("I'll be back...").build();
+	        	client.logout();
+	        	login();
+			}
+			else {
+				new MessageBuilder(client).withChannel(channel).withContent(deny).build();
+			}
+        /* ^botname */ } else if(command.startsWith("^botname")){
+			if(userID.equals("132739378203197440")){
+	        	client.changeUsername(command.substring(9, command.length()));
+				new MessageBuilder(client).withChannel(channel).withContent("Username changed to " + botName).build();
+			}
+			else {
+				new MessageBuilder(client).withChannel(channel).withContent(deny).build();
+			}
        	} else {
        		// String invalid = "Invalid command; see ^help for a list of commands.";
        		// new MessageBuilder(client).withChannel(channel).withContent(invalid).build();

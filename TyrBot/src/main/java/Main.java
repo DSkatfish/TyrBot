@@ -17,6 +17,7 @@ public class Main {
         }
         try {
             bot.login();
+            
         } catch (DiscordException e) {
             log.warn("Bot could not start", e);
         }
