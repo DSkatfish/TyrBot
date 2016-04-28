@@ -59,7 +59,7 @@ public class Instance extends Event implements IMessage, IDiscordClient, IUser {
     @EventSubscriber
     public void onReady(ReadyEvent event) throws DiscordException, HTTP429Exception {
         log.info("*** Discord bot armed ***");
-        client.changeAvatar(Image.forUrl("png", "http://puu.sh/ostXD/dce8cbe78c.png"));
+        //client.changeAvatar(Image.forUrl("png", "http://puu.sh/ostXD/dce8cbe78c.png"));
         client.updatePresence(false, Optional.of("Type ^tyr for info"));
     }
 
@@ -108,12 +108,19 @@ public class Instance extends Event implements IMessage, IDiscordClient, IUser {
         String info = "Bot created by @Skatfish#5926 using Discord4j"
         		+ "\nUse ^cmd for a list of commands.";
         String cmd = "Commands:"
+        		+ "\nUsable by @\u200beveryone"
         		+ "\n^cmd (duh)"
         		+ "\n^tyr"
         		+ "\n^this"
         		+ "\n^leave"
         		+ "\n^hentai"
-        		+ "\n^terminate (usable by bot creator Skatfish only)";
+        		+ "\n"
+        		+ "\nUsable only by bot creator Skatfish"
+        		+ "\n^setname"
+        		+ "\n^setavatar"
+        		+ "\n^terminate"
+        		+ "\n^restart"
+        		+ "\n^discr (experimental)";
        
         /* ^help */ //while (command.startsWith("^")){
         				if(command.equals("^tyr")){
@@ -162,14 +169,23 @@ public class Instance extends Event implements IMessage, IDiscordClient, IUser {
 	        	new MessageBuilder(client).withChannel(channel).withContent("I'll be back...").build();
 	        	client.logout();
 	        	login();
+	            
 			}
 			else {
 				new MessageBuilder(client).withChannel(channel).withContent(deny).build();
 			}
-        /* ^botname */ } else if(command.startsWith("^botname")){
+        /* ^setname */ } else if(command.startsWith("^setname")){
 			if(userID.equals("132739378203197440")){
 	        	client.changeUsername(command.substring(9, command.length()));
 				new MessageBuilder(client).withChannel(channel).withContent("Username changed to " + botName).build();
+			}
+			else {
+				new MessageBuilder(client).withChannel(channel).withContent(deny).build();
+			}
+        /* ^setavatar */ } else if(command.startsWith("^setavatar")){
+			if(userID.equals("132739378203197440")){
+				client.changeAvatar(Image.forUrl("jpg", command.substring(11, command.length())));
+				new MessageBuilder(client).withChannel(channel).withContent("Avatar changed.").build();
 			}
 			else {
 				new MessageBuilder(client).withChannel(channel).withContent(deny).build();
