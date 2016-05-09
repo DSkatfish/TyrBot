@@ -9,7 +9,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
 	public class CommandEvent extends Event {
-		final static String prefix = "*";
+		public static String prefix = "*";
 	
 		private final IMessage message;
 		private final String content;
@@ -82,18 +82,5 @@ import sx.blah.discord.handle.obj.IUser;
 		
 		public String getUserID() {
 			return userID;
-		}
-		
-		@EventSubscriber
-		public void onMessage(MessageReceivedEvent event) {
-			try
-			{
-			if (event.getMessage().getContent().toLowerCase().startsWith(prefix))
-			        event.getClient().getDispatcher().dispatch(new CommandEvent(event.getMessage(), event.getMessage().getContent(), message.getContent().split(" ")[0], Arrays.copyOfRange(message.getContent().split(" "), 1, message.getContent().split(" ").length), event.getMessage().getChannel(), event.getMessage().getChannel().getID(), event.getMessage().getGuild(), event.getMessage().getGuild().getID(), event.getMessage().getAuthor(), event.getMessage().getAuthor().getName(), event.getMessage().getAuthor().getID(), event.getClient().getOurUser(), event.getClient().getOurUser().getName(), event.getClient().getOurUser().getID()));
-			} 
-			catch (Exception ex)
-			{
-				
-			}
 		}
 }
